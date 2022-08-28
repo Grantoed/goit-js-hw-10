@@ -7,6 +7,7 @@ import { Notify } from 'notiflix';
 // import fetchCountries from './js/fetchCountries';
 // import clearOutput from './js/clearOutput';
 
+const BASE_URL = 'https://restcountries.com/v3.1/';
 const DEBOUNCE_DELAY = 300;
 
 const refs = {
@@ -26,25 +27,27 @@ function onInput() {
     clearOutput();
     return;
   }
-  fetchCountries(countryName).then(populateOutput);
+  fetchCountries(countryName)
+    .then(populateOutput)
+    .catch(() => makeFailureAlert());
 }
 
 function fetchCountries(name) {
-  const BASE_URL = 'https://restcountries.com/v3.1/';
-
   return fetch(
     `${BASE_URL}name/${name}?fields=name,population,flags,languages,capital`
   ).then(r => r.json());
 }
 
 function populateOutput(countries) {
-  const listMarkup = countries.map(
-    country =>
-      `<li class='country-item'>
+  const listMarkup = countries
+    .map(
+      country =>
+        `<li class='country-item'>
       <img class='country-flag' src="${country.flags.png}" alt="Country flag"/>
         ${country.name.official}
       </li>`
-  );
+    )
+    .join('');
 
   const cardMarkup = countries.map(
     country =>
@@ -65,6 +68,11 @@ function populateOutput(countries) {
       </ul>`
   );
 
+  if (countries.length > 10) {
+    makeInfoAlert();
+    return;
+  }
+
   if (countries.length > 2) {
     refs.list.innerHTML = listMarkup;
   } else {
@@ -72,6 +80,15 @@ function populateOutput(countries) {
   }
 }
 
+function makeInfoAlert() {
+  Notify.info('Too many matches found. Please enter a more specific name.');
+}
+
+function makeFailureAlert() {
+  Notify.failure('Oops, there is no country with that name');
+}
+
 function clearOutput() {
   refs.list.innerHTML = '';
+  refs.info.innerHTML = '';
 }
