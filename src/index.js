@@ -3,11 +3,8 @@ import './css/styles.css';
 import debounce from 'lodash.debounce';
 import { Notify } from 'notiflix';
 
-// import populateOutput from './js/populateOutput';
-// import fetchCountries from './js/fetchCountries';
-// import clearOutput from './js/clearOutput';
+import fetchCountries from './js/fetchCountries';
 
-const BASE_URL = 'https://restcountries.com/v3.1/';
 const DEBOUNCE_DELAY = 300;
 
 const refs = {
@@ -30,12 +27,6 @@ function onInput() {
   fetchCountries(countryName)
     .then(populateOutput)
     .catch(() => makeFailureAlert());
-}
-
-function fetchCountries(name) {
-  return fetch(
-    `${BASE_URL}name/${name}?fields=name,population,flags,languages,capital`
-  ).then(r => r.json());
 }
 
 function populateOutput(countries) {
